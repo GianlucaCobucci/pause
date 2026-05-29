@@ -907,7 +907,7 @@
         Finché resta il testo segnaposto, il sito usa
         il menù statico e non succede nulla.
      ─────────────────────────────────────────────── */
-  var CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTdS7NgosytaYU481c9kxZwZAirxakH8o6KDOTbztwS8rzBpqCx6LTYfxk37NZQZz3v85pvUHvawF9H/pub?gid=0&single=true&output=csv';
+  var CSV_URL = 'INCOLLA_QUI_URL_CSV';
 
   if (CSV_URL.indexOf('http') !== 0) return; /* non configurato → menù statico */
 
@@ -995,7 +995,17 @@
   function rowsToItems(rows) {
     if (!rows.length) return [];
     var idx = headerIndex(rows[0]);
-    if (idx.nome == null || idx.sezione == null) return []; /* intestazione non valida */
+    /* Sicurezza: se l'intestazione di una colonna manca o è scritta diversamente,
+       usa la posizione standard (sezione, nome, descrizione, prezzo, prezzo2,
+       etichetta, allergeni, mostra). Così un titolo cancellato non rompe il menù. */
+    if (idx.sezione == null) idx.sezione = 0;
+    if (idx.nome == null) idx.nome = 1;
+    if (idx.descrizione == null) idx.descrizione = 2;
+    if (idx.prezzo == null) idx.prezzo = 3;
+    if (idx.prezzo2 == null) idx.prezzo2 = 4;
+    if (idx.etichetta == null) idx.etichetta = 5;
+    if (idx.allergeni == null) idx.allergeni = 6;
+    if (idx.mostra == null) idx.mostra = 7;
     var out = [];
     for (var r = 1; r < rows.length; r++) {
       var c = rows[r];
