@@ -124,7 +124,7 @@
     .wrap { max-width: 820px; margin: 0 auto; padding: 0 5vw; }
 
     /* ── HERO ── */
-    #hero { text-align: center; padding: 4rem 5vw 3rem; border-bottom: 1px solid var(--border); }
+    #hero { text-align: center; padding: 4rem 5vw 1.8rem; border-bottom: 1px solid var(--border); }
     .hero-logo {
       display: block;
       width: 100%;
@@ -379,7 +379,9 @@
   <p class="nota">Info e prenotazioni dalle ore 16:00</p>
   <div class="hero-btns">
     <button class="btn"       onclick="goTo('menu')">Vedi il Men&ugrave;</button>
-    <button class="btn btn-o" onclick="openF()">Men&ugrave; Fissi</button>
+    <!-- Pulsante "Men&ugrave; Fissi" temporaneamente disattivato (in attesa dei menu fissi).
+         Per riattivarlo: togliere i marcatori di commento qui sotto. -->
+    <!-- <button class="btn btn-o" onclick="openF()">Men&ugrave; Fissi</button> -->
   </div>
 </section>
 
@@ -520,10 +522,10 @@
       <p class="cat-note-hl">Chiedi ai nostri ragazzi in sala gli stili che abbiamo in linea<br><strong>Non avere fretta!</strong> Alcune birre hanno bisogno di qualche minuto in pi&ugrave; per essere spillate perfettamente</p>
       <div class="item"><div class="i-l"><p class="i-name"><span style="font-size:1rem">🍺</span> 0,20 cl</p></div><span class="i-price">5.5</span></div>
       <div class="item"><div class="i-l"><p class="i-name"><span style="font-size:1.35rem">🍺</span> 0,30 cl</p></div><span class="i-price">6</span></div>
-      <div class="item"><div class="i-l"><p class="i-name"><span style="font-size:1.7rem">🍺</span> 0,40 cl</p></div><span class="i-price">7</span></div>
-      <div class="item"><div class="i-l"><p class="i-name"><span style="font-size:2.05rem">🍺</span> 0,50 cl</p></div><span class="i-price">8</span></div>
-      <div class="item"><div class="i-l"><p class="i-name"><span style="font-size:2.4rem">🍺</span> 1 lt</p></div><span class="i-price">15.5</span></div>
-      <div class="item"><div class="i-l"><p class="i-name"><span style="font-size:2.05rem">🍾</span> 0,50 cl</p><p class="i-desc">Da asporto &mdash; deposito cauzionale bottiglia in vetro 1.50</p></div><span class="i-price">7.5</span></div>
+      <div class="item"><div class="i-l"><p class="i-name"><span style="font-size:1.7rem">🍺</span> 0,40 cl</p></div><span class="i-price">7.5</span></div>
+      <div class="item"><div class="i-l"><p class="i-name"><span style="font-size:2.05rem">🍺</span> 0,50 cl</p></div><span class="i-price">8.5</span></div>
+      <div class="item"><div class="i-l"><p class="i-name"><span style="font-size:2.4rem">🍺</span> 1 lt</p></div><span class="i-price">17</span></div>
+      <div class="item"><div class="i-l"><p class="i-name"><span style="font-size:2.05rem">🍾</span> 0,50 cl</p><p class="i-desc">Da asporto &mdash; deposito cauzionale bottiglia in vetro 1.50</p></div><span class="i-price">8</span></div>
     </div>
 
     <!-- dyn-bibite: Bibite, Vini e Caffe vengono ricostruiti dal Foglio Google.
@@ -569,7 +571,7 @@
   <!-- PANETTERIA -->
   <div class="panel" id="p-panetteria"><div class="menu-wrap">
     <div class="cat">
-      <p class="cat-title">Panetteria senza glutine</p>
+      <p class="cat-title">Panetteria senza glutine<br>Da Asporto</p>
       <p class="cat-note-hl">Chiedi ai ragazzi in sala se abbiamo qualcosa di pronto in dispensa</p>
       <div class="item"><div class="i-l"><p class="i-name">Pagnotta</p><p class="i-desc">da 500 g</p></div><span class="i-price">9.5</span></div>
       <div class="item"><div class="i-l"><p class="i-name">Pane in cassetta</p><p class="i-desc">da 450 g</p></div><span class="i-price">7</span></div>
@@ -833,7 +835,7 @@
     MO: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><circle cx="20" cy="20" r="19" fill="#e0f2f1" stroke="#00695c" stroke-width="1.5"/><g fill="#00796b"><path d="M20 12 q-10 2-10 10 q0 6 10 8 q10-2 10-8 q0-8-10-10z"/><path d="M20 12 q-10 2-10 10 q0 6 10 8 q10-2 10-8 q0-8-10-10z" fill="#4db6ac" opacity=".5"/><path d="M20 12 l0 20" stroke="#004d40" stroke-width="1"/><path d="M10 20 q10-3 20 0" stroke="#004d40" stroke-width="1" fill="none"/><path d="M11 25 q9-2 18 0" stroke="#004d40" stroke-width="1" fill="none"/></g></svg>'
   };
 
-  var LABEL = { G:'Glutine', CR:'Crostacei', U:'Uova', P:'Pesce', AR:'Arachidi',
+  var LABEL = { G:'Frumento', CR:'Crostacei', U:'Uova', P:'Pesce', AR:'Arachidi',
     SO:'Soia', L:'Latte', FG:'Frutta a guscio', SE:'Sedano', SN:'Senape',
     SS:'Sesamo', SF:'Solfiti', LU:'Lupino', MO:'Molluschi' };
 
@@ -924,7 +926,7 @@
                   { key: 'Vini', title: 'Vini', cols: 2, hd: ['Calice', 'Bottiglia'], gf: false },
                   { key: 'Caffè e Amari', title: 'Caffè, Amari & Digestivi', cols: 1 } ],
     dolci:      [ { key: '',  title: 'Dolci', note: 'Tutti in versione mini<br>Tutti senza glutine', cols: 1 } ],
-    panetteria: [ { key: '',  title: 'Panetteria senza glutine', note: 'Chiedi ai ragazzi in sala se abbiamo qualcosa di pronto in dispensa', cols: 1 } ]
+    panetteria: [ { key: '',  title: 'Panetteria senza glutine', subtitle: 'Da Asporto', note: 'Chiedi ai ragazzi in sala se abbiamo qualcosa di pronto in dispensa', cols: 1 } ]
   };
 
   /* Contenitore in cui iniettare ogni sezione */
@@ -1123,7 +1125,9 @@
         if (!gi.length) return;
 
         var cat = document.createElement('div'); cat.className = 'cat';
-        var t = document.createElement('p'); t.className = 'cat-title'; t.textContent = group.title; cat.appendChild(t);
+        var t = document.createElement('p'); t.className = 'cat-title'; t.textContent = group.title;
+        if (group.subtitle) { t.appendChild(document.createElement('br')); t.appendChild(document.createTextNode(group.subtitle)); }
+        cat.appendChild(t);
         if (group.note) { var n = document.createElement('p'); n.className = 'cat-note-hl'; n.innerHTML = group.note; cat.appendChild(n); }
         if (group.cols === 2 && group.hd) {
           var hd = document.createElement('p'); hd.className = 'cat-prices-hd';
