@@ -1171,15 +1171,14 @@
      della pagina. La soluzione corretta è inoltrare la richiesta
      tramite un piccolo endpoint server-side (es. una funzione
      serverless) che tiene la chiave nascosta e poi chiama Brevo.
-     Qui sotto trovi predisposta la chiamata diretta (comoda per
-     partire subito) E lo spazio per usare un endpoint proxy:
-     basta valorizzare BREVO_PROXY_URL e lasciare vuota la chiave.
+     Unico percorso supportato: incolla in BREVO_PROXY_URL l'URL del
+     tuo endpoint PHP server-side (brevo-lead.php) che tiene la chiave
+     API al sicuro e chiama lui Brevo.
      ════════════════════════════════════════════ -->
 <script>
 (function () {
-  var BREVO_API_KEY  = '';            /* <-- incolla qui la tua chiave API Brevo (sconsigliato lato client) */
-  var BREVO_LIST_ID  = null;          /* <-- incolla qui il numero della lista Brevo, es. 5 */
-  var BREVO_PROXY_URL = '';           /* <-- in alternativa: indirizzo di un tuo endpoint server-side che inoltra a Brevo */
+  var BREVO_PROXY_URL = '/brevo-lead.php';           /* <-- incolla qui l'URL del tuo endpoint PHP, es. https://www.pausebirroteca.it/brevo-lead.php */
+  var BREVO_LIST_ID   = null;         /* la lista la gestisce il proxy PHP */
   var KEY = 'pause_promo_v2';         /* memoria locale: non ri-mostrare */
   var GIORNI = 30;                    /* dopo quanti giorni ri-proporlo */
   var RITARDO = 600;                  /* ms prima di mostrarlo all'apertura pagina */
@@ -1200,37 +1199,17 @@
     return '+39' + t.replace(/\D/g, '');
   }
   function inviaABrevo(dati) {
-    var payload = {
-      email: dati.email,
-      attributes: { NOME: dati.nome, SMS: normTel(dati.telefono) },
-      updateEnabled: true
-    };
-    if (BREVO_LIST_ID) payload.listIds = [Number(BREVO_LIST_ID)];
-
-    if (BREVO_PROXY_URL) {
-      /* Percorso consigliato: il tuo endpoint riceve i dati e
-         si occupa lui di chiamare Brevo con la chiave al sicuro */
-      return fetch(BREVO_PROXY_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: dati.email, nome: dati.nome, telefono: normTel(dati.telefono), listId: BREVO_LIST_ID })
-      });
+    if (!BREVO_PROXY_URL) {
+      /* Nessun endpoint configurato: non invia (utile per test) */
+      return Promise.resolve();
     }
-    if (BREVO_API_KEY) {
-      /* Chiamata diretta all'API Brevo (Crea contatto) */
-      return fetch('https://api.brevo.com/v3/contacts', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'api-key': BREVO_API_KEY
-        },
-        body: JSON.stringify(payload)
-      });
-    }
-    /* Nessuna integrazione configurata: non invia nulla, ma il popup
-       funziona comunque (utile per test prima di collegare Brevo) */
-    return Promise.resolve();
+    /* Unico percorso: il proxy PHP riceve i dati e chiama Brevo,
+       tenendo la chiave API al sicuro sul server. */
+    return fetch(BREVO_PROXY_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: dati.email, nome: dati.nome, telefono: normTel(dati.telefono), listId: BREVO_LIST_ID })
+    });
   }
 
   window.submitPromo = function (e) {
