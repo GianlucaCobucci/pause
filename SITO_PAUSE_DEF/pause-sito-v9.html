@@ -610,7 +610,7 @@
   <div class="ft-links">
     <a href="#menu"  onclick="goTo('menu');  return false">Menu</a>
     <a href="#info"  onclick="goTo('info');  return false">Contatti</a>
-    <button onclick="openA()">Allergeni</button>
+    <a href="https://www.pausebirroteca.it/privacy-policy/" target="_blank" rel="noopener">Privacy Policy</a>
   </div>
 </footer>
 
@@ -719,12 +719,12 @@
         <input id="pf-email" type="email" name="email" autocomplete="email" required>
         <label style="display:flex;align-items:flex-start;gap:.5rem;margin-top:.9rem;cursor:pointer;font-family:'Lato',sans-serif;font-size:.78rem;font-weight:400;letter-spacing:normal;text-transform:none;color:var(--mid)">
           <input type="checkbox" id="pf-privacy" name="privacy" required style="width:auto;margin-top:.2rem;flex-shrink:0">
-          <span>Ho letto e accetto la <a href="/privacy-policy" target="_blank" rel="noopener" style="text-decoration:underline">Privacy Policy</a> e acconsento al trattamento dei miei dati personali per ricevere comunicazioni promozionali.</span>
+          <span>Ho letto e accetto la <a href="https://www.pausebirroteca.it/privacy-policy/" target="_blank" rel="noopener" style="text-decoration:underline">Privacy Policy</a> e acconsento al trattamento dei miei dati personali per ricevere comunicazioni promozionali.</span>
         </label>
         <p class="promo-err" id="promoErr">Compila nome, telefono ed email correttamente e accetta la privacy policy.</p>
         <div class="promo-actions" style="flex-direction:column">
           <button type="submit" class="btn">Sì, voglio accedere al menù e scoprire gli sconti!</button>
-          <a href="https://www.pausebirroteca.it/menu/" class="btn btn-o" style="text-align:center" onclick="closePromo()">No grazie, voglio solo leggere il menù.</a>
+          <button type="button" class="btn btn-o" style="text-align:center" onclick="closePromo()">No grazie, voglio solo leggere il menù.</button>
         </div>
       </form>
     </div>
@@ -1146,10 +1146,16 @@
   function apri() { ov.classList.add('open'); document.body.style.overflow = 'hidden'; }
   window.closePromo = function () { ov.classList.remove('open'); document.body.style.overflow = ''; segnaFatto(); };
 
+  function normTel(t) {
+    t = (t || '').trim().replace(/[\s().\-]/g, '');
+    if (t.charAt(0) === '+') return t;
+    if (t.indexOf('0039') === 0) return '+' + t.slice(2);
+    return '+39' + t.replace(/\D/g, '');
+  }
   function inviaABrevo(dati) {
     var payload = {
       email: dati.email,
-      attributes: { NOME: dati.nome, SMS: dati.telefono },
+      attributes: { NOME: dati.nome, SMS: normTel(dati.telefono) },
       updateEnabled: true
     };
     if (BREVO_LIST_ID) payload.listIds = [Number(BREVO_LIST_ID)];
@@ -1160,7 +1166,7 @@
       return fetch(BREVO_PROXY_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: dati.email, nome: dati.nome, telefono: dati.telefono, listId: BREVO_LIST_ID })
+        body: JSON.stringify({ email: dati.email, nome: dati.nome, telefono: normTel(dati.telefono), listId: BREVO_LIST_ID })
       });
     }
     if (BREVO_API_KEY) {
