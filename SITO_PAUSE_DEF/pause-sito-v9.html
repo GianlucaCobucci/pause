@@ -701,27 +701,31 @@
   </div>
 </div>
 
+<!-- ════════ MODAL PROMO — raccolta lead via BREVO ════════ -->
 <div class="modal-ov" id="promoModal">
   <div class="modal-inner" style="max-width:440px">
     <div class="modal-hd">
-      <h2>Promozioni PAUSE</h2>
+      <h2>Accedi al menù</h2>
       <button class="modal-x" onclick="closePromo()" aria-label="Chiudi">&#10005;</button>
     </div>
     <div class="modal-bd">
-      <p class="promo-text">Vuoi avere informazioni sulle nostre nuove promozioni? Lasciaci nome, cognome e numero di telefono.</p>
+      <p class="promo-text">Inserisci la tua email e accedi subito al menù del nostro ristorante.<br>Ti mandiamo promo esclusive e sconti riservati solo a chi si registra.</p>
       <form class="promo-form" id="promoForm" onsubmit="return submitPromo(event)">
         <label for="pf-nome">Nome</label>
         <input id="pf-nome" type="text" name="nome" autocomplete="given-name" required>
-        <label for="pf-cognome">Cognome</label>
-        <input id="pf-cognome" type="text" name="cognome" autocomplete="family-name" required>
-        <label for="pf-tel">Telefono</label>
-        <input id="pf-tel" type="tel" name="telefono" inputmode="tel" autocomplete="tel" required>
-        <p class="promo-err" id="promoErr">Compila tutti i campi.</p>
-        <div class="promo-actions">
-          <button type="button" class="btn btn-o" onclick="closePromo()">No grazie</button>
-          <button type="submit" class="btn">Invia</button>
+        <label for="pf-telefono">Telefono</label>
+        <input id="pf-telefono" type="tel" name="telefono" autocomplete="tel" required>
+        <label for="pf-email">Email</label>
+        <input id="pf-email" type="email" name="email" autocomplete="email" required>
+        <label style="display:flex;align-items:flex-start;gap:.5rem;margin-top:.9rem;cursor:pointer;font-family:'Lato',sans-serif;font-size:.78rem;font-weight:400;letter-spacing:normal;text-transform:none;color:var(--mid)">
+          <input type="checkbox" id="pf-privacy" name="privacy" required style="width:auto;margin-top:.2rem;flex-shrink:0">
+          <span>Ho letto e accetto la <a href="/privacy-policy" target="_blank" rel="noopener" style="text-decoration:underline">Privacy Policy</a> e acconsento al trattamento dei miei dati personali per ricevere comunicazioni promozionali.</span>
+        </label>
+        <p class="promo-err" id="promoErr">Compila nome, telefono ed email correttamente e accetta la privacy policy.</p>
+        <div class="promo-actions" style="flex-direction:column">
+          <button type="submit" class="btn">Sì, voglio accedere al menù e scoprire gli sconti!</button>
+          <a href="https://www.pausebirroteca.it/menu/" class="btn btn-o" style="text-align:center" onclick="closePromo()">No grazie, voglio solo leggere il menù.</a>
         </div>
-        <p class="promo-priv">Lasciando i tuoi dati acconsenti a essere ricontattato per promozioni. Niente spam.</p>
       </form>
     </div>
   </div>
@@ -1108,53 +1112,102 @@
 })();
 </script>
 
+<!-- ════════════════════════════════════════════
+     PROMO — popup raccolta lead (integrazione BREVO)
+     >>> Incolla qui sotto la tua chiave API di Brevo e il
+         List ID a cui aggiungere i contatti. Si trovano in:
+         Brevo > Impostazioni > Chiavi API / SMTP & API
+         e in Contatti > Liste (numero accanto al nome lista). <<<
+
+     NOTA SICUREZZA: chiamare l'API di Brevo direttamente dal
+     browser espone la chiave API a chiunque guardi il codice
+     della pagina. La soluzione corretta è inoltrare la richiesta
+     tramite un piccolo endpoint server-side (es. una funzione
+     serverless) che tiene la chiave nascosta e poi chiama Brevo.
+     Qui sotto trovi predisposta la chiamata diretta (comoda per
+     partire subito) E lo spazio per usare un endpoint proxy:
+     basta valorizzare BREVO_PROXY_URL e lasciare vuota la chiave.
+     ════════════════════════════════════════════ -->
 <script>
 (function () {
-  var PROMO_ENDPOINT = '';            
-  var KEY = 'pause_promo_v1';         
-  var GIORNI = 30;                    
-  var RITARDO = 900;                  
-
+  var BREVO_API_KEY  = '';            /* <-- incolla qui la tua chiave API Brevo (sconsigliato lato client) */
+  var BREVO_LIST_ID  = null;          /* <-- incolla qui il numero della lista Brevo, es. 5 */
+  var BREVO_PROXY_URL = '';           /* <-- in alternativa: indirizzo di un tuo endpoint server-side che inoltra a Brevo */
+  var KEY = 'pause_promo_v2';         /* memoria locale: non ri-mostrare */
+  var GIORNI = 30;                    /* dopo quanti giorni ri-proporlo */
+  var RITARDO = 600;                  /* ms prima di mostrarlo all'apertura pagina */
   var ov = document.getElementById('promoModal');
   if (!ov) return;
-
   function segnaFatto() { try { localStorage.setItem(KEY, String(Date.now())); } catch (e) {} }
   function fattoDiRecente() {
     try { var t = +localStorage.getItem(KEY); return t && (Date.now() - t) < GIORNI * 86400000; }
     catch (e) { return false; }
   }
   function apri() { ov.classList.add('open'); document.body.style.overflow = 'hidden'; }
-
   window.closePromo = function () { ov.classList.remove('open'); document.body.style.overflow = ''; segnaFatto(); };
+
+  function inviaABrevo(dati) {
+    var payload = {
+      email: dati.email,
+      attributes: { NOME: dati.nome, SMS: dati.telefono },
+      updateEnabled: true
+    };
+    if (BREVO_LIST_ID) payload.listIds = [Number(BREVO_LIST_ID)];
+
+    if (BREVO_PROXY_URL) {
+      /* Percorso consigliato: il tuo endpoint riceve i dati e
+         si occupa lui di chiamare Brevo con la chiave al sicuro */
+      return fetch(BREVO_PROXY_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: dati.email, nome: dati.nome, telefono: dati.telefono, listId: BREVO_LIST_ID })
+      });
+    }
+    if (BREVO_API_KEY) {
+      /* Chiamata diretta all'API Brevo (Crea contatto) */
+      return fetch('https://api.brevo.com/v3/contacts', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'api-key': BREVO_API_KEY
+        },
+        body: JSON.stringify(payload)
+      });
+    }
+    /* Nessuna integrazione configurata: non invia nulla, ma il popup
+       funziona comunque (utile per test prima di collegare Brevo) */
+    return Promise.resolve();
+  }
 
   window.submitPromo = function (e) {
     e.preventDefault();
     var f = e.target;
-    var data = {
-      nome: f.nome.value.trim(),
-      cognome: f.cognome.value.trim(),
-      telefono: f.telefono.value.trim(),
-      origine: 'menu-pause', data_invio: new Date().toISOString()
-    };
-    if (!data.nome || !data.cognome || !data.telefono) {
+    var nome = f.nome.value.trim();
+    var telefono = f.telefono.value.trim();
+    var email = f.email.value.trim();
+    var privacyOk = f.privacy.checked;
+    var emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    var telefonoOk = telefono.length >= 6;
+    if (!nome || !emailOk || !telefonoOk || !privacyOk) {
       document.getElementById('promoErr').style.display = 'block';
       return false;
     }
+    document.getElementById('promoErr').style.display = 'none';
+
     function fine() {
       segnaFatto();
-      f.innerHTML = '<p class="promo-text" style="text-align:center;margin:1.4rem 0 .8rem">Grazie! 🍺<br>Ti avviseremo delle novit&agrave;.</p>';
-      setTimeout(window.closePromo, 1700);
+      f.innerHTML = '<p class="promo-text" style="text-align:center;margin:1.4rem 0 .8rem">Grazie! 🍺<br>Ora puoi sfogliare il men&ugrave; e scoprire le nostre promo.</p>';
+      setTimeout(window.closePromo, 1500);
     }
-    if (PROMO_ENDPOINT) {
-      fetch(PROMO_ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
-        .then(fine).catch(fine);
-    } else { fine(); }
+    inviaABrevo({ nome: nome, telefono: telefono, email: email }).then(fine).catch(fine);
     return false;
   };
 
   ov.addEventListener('click', function (e) { if (e.target === ov) window.closePromo(); });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && ov.classList.contains('open')) window.closePromo(); });
 
+  /* Si apre appena la pagina viene caricata (sempre, salvo già fatto di recente) */
   if (!fattoDiRecente()) setTimeout(apri, RITARDO);
 })();
 </script>
