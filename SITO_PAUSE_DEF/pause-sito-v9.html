@@ -342,7 +342,16 @@
     .a-item:last-child { border-bottom: none; }
     .a-name { font-weight: 600; color: var(--dark); flex-shrink: 0; max-width: 44%; }
     .a-list { color: var(--light); font-style: italic; text-align: right; flex: 1; }
-  
+
+    /* ── PROMO (raccolta contatti) ── */
+    .promo-text { font-size: .92rem; color: var(--mid); line-height: 1.6; margin-bottom: 1rem; }
+    .promo-form label { display: block; font-family: 'Montserrat', sans-serif; font-size: .6rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--light); margin: .7rem 0 .25rem; }
+    .promo-form input { width: 100%; padding: .7rem .8rem; border: 1px solid var(--border); font-family: 'Lato', sans-serif; font-size: .95rem; color: var(--dark); background: #fff; }
+    .promo-form input:focus { outline: none; border-color: var(--black); }
+    .promo-err { color: #c0392b; font-size: .8rem; margin-top: .6rem; display: none; }
+    .promo-actions { display: flex; gap: .7rem; margin-top: 1.3rem; }
+    .promo-actions .btn { flex: 1; padding: .72rem 1rem; }
+    .promo-priv { font-size: .72rem; color: var(--light); margin-top: .9rem; line-height: 1.45; }
 
   </style>
 </head>
@@ -733,6 +742,33 @@
         <p class="a-cat-title">Men&ugrave; B &mdash; esempio</p>
         <div class="a-item"><span class="a-name">Hamburger + Chips + Birra</span><span class="a-list">Sostituisci con la descrizione reale</span></div>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL PROMO (raccolta contatti — solo menù normale) -->
+<div class="modal-ov" id="promoModal">
+  <div class="modal-inner" style="max-width:440px">
+    <div class="modal-hd">
+      <h2>Promozioni PAUSE</h2>
+      <button class="modal-x" onclick="closePromo()" aria-label="Chiudi">&#10005;</button>
+    </div>
+    <div class="modal-bd">
+      <p class="promo-text">Vuoi avere informazioni sulle nostre nuove promozioni? Lasciaci nome, cognome e numero di telefono.</p>
+      <form class="promo-form" id="promoForm" onsubmit="return submitPromo(event)">
+        <label for="pf-nome">Nome</label>
+        <input id="pf-nome" type="text" name="nome" autocomplete="given-name" required>
+        <label for="pf-cognome">Cognome</label>
+        <input id="pf-cognome" type="text" name="cognome" autocomplete="family-name" required>
+        <label for="pf-tel">Telefono</label>
+        <input id="pf-tel" type="tel" name="telefono" inputmode="tel" autocomplete="tel" required>
+        <p class="promo-err" id="promoErr">Compila tutti i campi.</p>
+        <div class="promo-actions">
+          <button type="button" class="btn btn-o" onclick="closePromo()">No grazie</button>
+          <button type="submit" class="btn">Invia</button>
+        </div>
+        <p class="promo-priv">Lasciando i tuoi dati acconsenti a essere ricontattato per promozioni. Niente spam.</p>
+      </form>
     </div>
   </div>
 </div>
@@ -1161,6 +1197,62 @@
       if (items.length) render(items);
     })
     .catch(function () { /* errore di rete → resta il menù statico */ });
+})();
+</script>
+<!-- ════════════════════════════════════════════
+     PROMO — popup raccolta contatti (solo menù normale)
+     >>> Il professionista che raccoglie i dati incolla in PROMO_ENDPOINT
+         l'indirizzo dove inviare i contatti (es. modulo/servizio web).
+         Finché è vuoto, il form ringrazia e chiude (dati NON inviati). <<<
+     ════════════════════════════════════════════ -->
+<script>
+(function () {
+  var PROMO_ENDPOINT = '';            /* <-- incollare qui l'indirizzo di raccolta dati */
+  var KEY = 'pause_promo_v1';         /* memoria locale: non ri-mostrare */
+  var GIORNI = 30;                    /* dopo quanti giorni ri-proporlo */
+  var RITARDO = 900;                  /* ms prima di mostrarlo */
+
+  var ov = document.getElementById('promoModal');
+  if (!ov) return;
+
+  function segnaFatto() { try { localStorage.setItem(KEY, String(Date.now())); } catch (e) {} }
+  function fattoDiRecente() {
+    try { var t = +localStorage.getItem(KEY); return t && (Date.now() - t) < GIORNI * 86400000; }
+    catch (e) { return false; }
+  }
+  function apri() { ov.classList.add('open'); document.body.style.overflow = 'hidden'; }
+
+  window.closePromo = function () { ov.classList.remove('open'); document.body.style.overflow = ''; segnaFatto(); };
+
+  window.submitPromo = function (e) {
+    e.preventDefault();
+    var f = e.target;
+    var data = {
+      nome: f.nome.value.trim(),
+      cognome: f.cognome.value.trim(),
+      telefono: f.telefono.value.trim(),
+      origine: 'menu-pause', data_invio: new Date().toISOString()
+    };
+    if (!data.nome || !data.cognome || !data.telefono) {
+      document.getElementById('promoErr').style.display = 'block';
+      return false;
+    }
+    function fine() {
+      segnaFatto();
+      f.innerHTML = '<p class="promo-text" style="text-align:center;margin:1.4rem 0 .8rem">Grazie! 🍺<br>Ti avviseremo delle novit&agrave;.</p>';
+      setTimeout(window.closePromo, 1700);
+    }
+    if (PROMO_ENDPOINT) {
+      fetch(PROMO_ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
+        .then(fine).catch(fine);
+    } else { fine(); }
+    return false;
+  };
+
+  ov.addEventListener('click', function (e) { if (e.target === ov) window.closePromo(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && ov.classList.contains('open')) window.closePromo(); });
+
+  if (!fattoDiRecente()) setTimeout(apri, RITARDO);
 })();
 </script>
 </body>
