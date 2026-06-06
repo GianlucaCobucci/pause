@@ -331,6 +331,10 @@
     .promo-actions .btn { flex: 1; padding: .72rem 1rem; }
     .promo-priv { font-size: .72rem; color: var(--light); margin-top: .9rem; line-height: 1.45; }
 
+    .priv-modal .modal-bd h3 { font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: .72rem; letter-spacing: .14em; text-transform: uppercase; color: var(--black); margin: 1.3rem 0 .5rem; }
+    .priv-modal .modal-bd h3:first-child { margin-top: 0; }
+    .priv-modal .modal-bd p { font-size: .85rem; color: var(--mid); line-height: 1.6; margin-bottom: .7rem; }
+    .priv-modal .modal-bd a { color: var(--accent); text-decoration: underline; word-break: break-word; }
   </style>
 </head>
 <body>
@@ -610,7 +614,7 @@
   <div class="ft-links">
     <a href="#menu"  onclick="goTo('menu');  return false">Menu</a>
     <a href="#info"  onclick="goTo('info');  return false">Contatti</a>
-    <a href="https://www.pausebirroteca.it/privacy-policy/" target="_blank" rel="noopener">Privacy Policy</a>
+    <a href="#" onclick="openPrivacy(); return false">Privacy Policy</a>
   </div>
 </footer>
 
@@ -719,7 +723,7 @@
         <input id="pf-email" type="email" name="email" autocomplete="email" required>
         <label style="display:flex;align-items:flex-start;gap:.5rem;margin-top:.9rem;cursor:pointer;font-family:'Lato',sans-serif;font-size:.78rem;font-weight:400;letter-spacing:normal;text-transform:none;color:var(--mid)">
           <input type="checkbox" id="pf-privacy" name="privacy" required style="width:auto;margin-top:.2rem;flex-shrink:0">
-          <span>Ho letto e accetto la <a href="https://www.pausebirroteca.it/privacy-policy/" target="_blank" rel="noopener" style="text-decoration:underline">Privacy Policy</a> e acconsento al trattamento dei miei dati personali per ricevere comunicazioni promozionali.</span>
+          <span>Ho letto e accetto la <a href="#" onclick="openPrivacy(); return false" style="text-decoration:underline">Privacy Policy</a> e acconsento al trattamento dei miei dati personali per ricevere comunicazioni promozionali.</span>
         </label>
         <p class="promo-err" id="promoErr">Compila nome, telefono ed email correttamente e accetta la privacy policy.</p>
         <div class="promo-actions" style="flex-direction:column">
@@ -727,6 +731,49 @@
           <button type="button" class="btn btn-o" style="text-align:center" onclick="closePromo()">No grazie, voglio solo leggere il menù.</button>
         </div>
       </form>
+    </div>
+  </div>
+</div>
+
+<div class="modal-ov" id="privacyModal">
+  <div class="modal-inner priv-modal">
+    <div class="modal-hd">
+      <h2>Privacy Policy</h2>
+      <button class="modal-x" onclick="closePrivacy()" aria-label="Chiudi">&#10005;</button>
+    </div>
+    <div class="modal-bd">
+      <h3>Chi siamo</h3>
+      <p>L&rsquo;indirizzo del nostro sito web &egrave;: <a href="https://www.pausebirroteca.it" target="_blank" rel="noopener">https://www.pausebirroteca.it</a>.</p>
+      <h3>Quali dati personali raccogliamo e perch&eacute;</h3>
+      <p>Attraverso il modulo di prenotazione raccogliamo il tuo indirizzo email, il tuo nome, il tuo cognome e il tuo numero di cellulare.</p>
+      <p>Possiamo raccogliere anche il tuo indirizzo IP dal quale visiti il nostro sito, ma non lo conserviamo per alcun utilizzo.</p>
+      <h3>Commenti</h3>
+      <p>Quando i visitatori lasciano commenti sul sito, raccogliamo i dati mostrati nel modulo dei commenti e anche l&rsquo;indirizzo IP del visitatore e la stringa del user agent del browser per aiutare il rilevamento dello spam.</p>
+      <p>Una stringa anonimizzata creata dal tuo indirizzo email (anche chiamato hash) pu&ograve; essere fornita al servizio Gravatar per vedere se lo stai utilizzando. La privacy policy del servizio Gravatar &egrave; disponibile qui: <a href="https://automattic.com/privacy/" target="_blank" rel="noopener">https://automattic.com/privacy/</a>. Dopo l&rsquo;approvazione del tuo commento, la tua immagine del profilo &egrave; visibile al pubblico nel contesto del tuo commento.</p>
+      <h3>Media</h3>
+      <p>Se carichi immagini sul sito web, dovresti evitare di caricare immagini con inclusi i dati di posizione incorporati (EXIF GPS). I visitatori del sito web possono scaricare ed estrarre qualsiasi dato sulla posizione dalle immagini sul sito web.</p>
+      <h3>Modulo di contatto</h3>
+      <p>Attraverso il modulo di contatto raccogliamo il tuo nome, cognome, indirizzo e-mail e numero di telefono mobile.</p>
+      <h3>Cookie</h3>
+      <p>Se lasci un commento sul nostro sito, puoi scegliere di salvare il tuo nome, indirizzo email e sito web nei cookie. Sono per la tua comodit&agrave; in modo che tu non debba riempire nuovamente i tuoi dati quando lasci un altro commento. Questi cookie rimarranno per un anno.</p>
+      <p>Se hai un account e accedi a questo sito, verr&agrave; impostato un cookie temporaneo per determinare se il browser accetta i cookie. Questo cookie non contiene dati personali e viene eliminato quando si chiude il browser.</p>
+      <p>Quando effettui l&rsquo;accesso, verranno impostati diversi cookie per salvare le informazioni di accesso e le opzioni di visualizzazione dello schermo. I cookie di accesso rimangono per due giorni e i cookie delle opzioni sullo schermo rimangono per un anno. Se selezioni &ldquo;Ricordami&rdquo;, il tuo login persister&agrave; per due settimane. Se esci dal tuo account, i cookie di accesso verranno rimossi.</p>
+      <h3>Contenuto incorporato da altri siti web</h3>
+      <p>Gli articoli su questo sito possono includere contenuti incorporati (ad esempio video, immagini, articoli, ecc.). I contenuti incorporati di altri siti web si comportano esattamente nello stesso modo in cui il visitatore ha visitato l&rsquo;altro sito web.</p>
+      <p>Questi siti web possono raccogliere dati su di te, utilizzare cookie, integrare ulteriori tracciamenti di terze parti, e monitorare l&rsquo;interazione con quel contenuto incorporato, incluso il tracciare la tua interazione con il contenuto incorporato se hai un account e sei connesso a quel sito web.</p>
+      <h3>Con chi condividiamo i tuoi dati</h3>
+      <p>I tuoi dati sono condivisi con il nostro gestore dei servizi internet, REFIX Studio, con sede in Via Frascati 23, 00030, Colonna.</p>
+      <h3>Per quanto tempo conserviamo i tuoi dati</h3>
+      <p>Se si lascia un commento, il commento e i relativi metadati vengono conservati a tempo indeterminato. &Egrave; cos&igrave; che possiamo riconoscere e approvare automaticamente eventuali commenti di follow-up invece di tenerli in una coda di moderazione.</p>
+      <p>Per gli utenti che si registrano sul nostro sito web (se presenti), memorizziamo anche le informazioni personali che forniscono nel loro profilo utente. Tutti gli utenti possono vedere, modificare o cancellare le loro informazioni personali in qualsiasi momento (eccetto il loro nome utente che non possono cambiare). Gli amministratori del sito web possono anche vedere e modificare queste informazioni.</p>
+      <h3>Quali diritti hai sui tuoi dati</h3>
+      <p>Se hai un account su questo sito, o hai lasciato commenti, puoi richiedere di ricevere un file esportato dal sito con i dati personali che abbiamo su di te, compresi i dati che ci hai fornito. Puoi anche richiedere che cancelliamo tutti i dati personali che ti riguardano. Questo non include i dati che siamo obbligati a conservare per scopi amministrativi, legali o di sicurezza.</p>
+      <h3>Dove spediamo i tuoi dati</h3>
+      <p>I commenti dei visitatori possono essere controllati attraverso un servizio di rilevamento automatico dello spam.</p>
+      <h3>Le tue informazioni di contatto</h3>
+      <p>PAUSE &ndash; Via Frascati 23, 00030, Colonna, Roma &middot; TEL <a href="tel:069438097">06/9438097</a> &middot; <a href="mailto:info@pausebirroteca.it">info@pausebirroteca.it</a></p>
+      <h3>Informazioni aggiuntive</h3>
+      <p>Utilizziamo i tuoi dati esclusivamente per conferma della tua prenotazione e per inviarti email promozionali sulle nostre attivit&agrave;.</p>
     </div>
   </div>
 </div>
@@ -1215,6 +1262,16 @@
 
   /* Si apre appena la pagina viene caricata (sempre, salvo già fatto di recente) */
   if (!fattoDiRecente()) setTimeout(apri, RITARDO);
+})();
+</script>
+<script>
+(function(){
+  var pm=document.getElementById('privacyModal');
+  if(!pm) return;
+  window.openPrivacy=function(){ pm.classList.add('open'); document.body.style.overflow='hidden'; };
+  window.closePrivacy=function(){ pm.classList.remove('open'); if(!document.querySelector('.modal-ov.open')) document.body.style.overflow=''; };
+  pm.addEventListener('click', function(e){ if(e.target===pm) window.closePrivacy(); });
+  document.addEventListener('keydown', function(e){ if(e.key==='Escape' && pm.classList.contains('open')) window.closePrivacy(); });
 })();
 </script>
 </body>
