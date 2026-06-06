@@ -177,15 +177,20 @@
     .tab:hover { color: var(--dark); }
     .tab.on { color: #fff; background: var(--black); border-radius: 7px; border-bottom-color: transparent; }
     .tab-chevron {
-      position: absolute; right: 0; top: 0; bottom: 1px; width: 34px;
-      display: flex; align-items: center; justify-content: flex-end; padding-right: 7px;
-      background: linear-gradient(to right, rgba(255,255,255,0), #fff 65%);
-      color: var(--accent); font-size: 1.6rem; font-weight: 700; line-height: 1;
-      pointer-events: none; border: none;
-      transition: opacity .25s; animation: chevPulse 1.4s ease-in-out infinite;
+      position: absolute; top: 0; bottom: 1px; width: 44px;
+      display: flex; align-items: center;
+      color: var(--accent); font-size: 2.2rem; font-weight: 700; line-height: 1;
+      pointer-events: none; border: none; transition: opacity .25s;
     }
+    .tab-chevron.right { right: 0; justify-content: flex-end; padding-right: 6px;
+      background: linear-gradient(to right, rgba(255,255,255,0), #fff 60%);
+      animation: chevPulseR 1.4s ease-in-out infinite; }
+    .tab-chevron.left { left: 0; justify-content: flex-start; padding-left: 6px;
+      background: linear-gradient(to left, rgba(255,255,255,0), #fff 60%);
+      animation: chevPulseL 1.4s ease-in-out infinite; }
     .tab-chevron.hide { opacity: 0; }
-    @keyframes chevPulse { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(-3px); } }
+    @keyframes chevPulseR { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(-3px); } }
+    @keyframes chevPulseL { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(3px); } }
 
     .panel { display: none; }
     .panel.on { display: block; animation: fadeTab .22s ease; }
@@ -402,7 +407,8 @@
       <button class="tab" data-t="panetteria">🍞 Panetteria senza glutine</button>
     </div>
     </div>
-    <span class="tab-chevron hide" id="tabChevron" aria-hidden="true">&#8250;</span>
+    <span class="tab-chevron left hide" id="tabChevronL" aria-hidden="true">&#8249;</span>
+    <span class="tab-chevron right hide" id="tabChevron" aria-hidden="true">&#8250;</span>
   </div>
 
   <div class="panel on" id="p-fritti"><div class="menu-wrap">
@@ -1268,15 +1274,26 @@
 </script>
 <script>
 (function(){
-  var wrap=document.getElementById('tabsWrap'), chev=document.getElementById('tabChevron');
-  if(!wrap||!chev) return;
+  var wrap=document.getElementById('tabsWrap'), tabs=document.getElementById('tabs');
+  var chevR=document.getElementById('tabChevron'), chevL=document.getElementById('tabChevronL');
+  if(!wrap||!tabs) return;
   function update(){
-    var more = (wrap.scrollWidth - wrap.clientWidth - wrap.scrollLeft) > 4;
-    chev.classList.toggle('hide', !more);
+    var canR=(wrap.scrollWidth - wrap.clientWidth - wrap.scrollLeft) > 4;
+    var canL=wrap.scrollLeft > 4;
+    if(chevR) chevR.classList.toggle('hide', !canR);
+    if(chevL) chevL.classList.toggle('hide', !canL);
   }
   wrap.addEventListener('scroll', update, {passive:true});
   window.addEventListener('resize', update);
   update();
+  function centerTab(t){
+    var wr=wrap.getBoundingClientRect(), tr=t.getBoundingClientRect();
+    var delta=(tr.left + tr.width/2) - (wr.left + wr.width/2);
+    wrap.scrollTo({left: wrap.scrollLeft + delta, behavior:'smooth'});
+  }
+  tabs.addEventListener('click', function(e){
+    var b=e.target.closest('.tab'); if(b && b.dataset.t) centerTab(b);
+  });
   var nudged=false;
   function nudge(){
     if(nudged) return; nudged=true;
