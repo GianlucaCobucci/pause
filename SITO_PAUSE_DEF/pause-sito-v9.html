@@ -1019,6 +1019,7 @@
       else if (k === 'prezzo') idx.prezzo = i;
       else if (k === 'prezzo2' || k === 'prezzo gf' || k === 'prezzo senza glutine' || k === 'prezzo 2') idx.prezzo2 = i;
       else if (k === 'etichetta') idx.etichetta = i;
+      else if (k === 'nota') idx.nota = i;
       else if (k === 'allergeni') idx.allergeni = i;
       else if (k === 'mostra') idx.mostra = i;
     });
@@ -1044,7 +1045,7 @@
       var it = {
         sezione: g('sezione'), nome: g('nome'), descrizione: g('descrizione'),
         prezzo: g('prezzo'), prezzo2: g('prezzo2'), etichetta: g('etichetta'),
-        allergeni: g('allergeni'), mostra: g('mostra')
+        allergeni: g('allergeni'), nota: g('nota'), mostra: g('mostra')
       };
       if (!it.nome) continue;                          
       if (/^(no|n|nascondi)$/i.test(it.mostra)) continue; 
@@ -1067,6 +1068,11 @@
       name.appendChild(document.createTextNode(' ')); name.appendChild(b);
     });
     left.appendChild(name);
+
+    if (it.nota) {
+      var m = document.createElement('p'); m.className = 'i-mini'; m.textContent = it.nota;
+      left.appendChild(m);
+    }
 
     if (it.descrizione) {
       var d = document.createElement('p'); d.className = 'i-desc'; d.textContent = it.descrizione;
