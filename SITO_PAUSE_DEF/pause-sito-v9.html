@@ -749,8 +749,8 @@
         <label for="pf-email">Email</label>
         <input id="pf-email" type="email" name="email" autocomplete="email" required>
         <div aria-hidden="true" style="position:absolute;left:-9999px;top:-9999px;width:1px;height:1px;overflow:hidden">
-          <label for="pf-website">Non compilare questo campo</label>
-          <input id="pf-website" type="text" name="website" tabindex="-1" autocomplete="off">
+          <label for="pf-hpot">Non compilare questo campo</label>
+          <input id="pf-hpot" type="text" name="hpot" tabindex="-1" autocomplete="off" readonly onfocus="this.removeAttribute('readonly')">
         </div>
         <label style="display:flex;align-items:flex-start;gap:.5rem;margin-top:.9rem;cursor:pointer;font-family:'Lato',sans-serif;font-size:.78rem;font-weight:400;letter-spacing:normal;text-transform:none;color:var(--mid)">
           <input type="checkbox" id="pf-privacy" name="privacy" required style="width:auto;margin-top:.2rem;flex-shrink:0">
@@ -1255,7 +1255,7 @@
     var nome = f.nome.value.trim();
     var telefono = f.telefono.value.trim();
     var email = f.email.value.trim();
-    var website = f.website ? f.website.value : '';
+    var website = f.hpot ? f.hpot.value : '';
     var privacyOk = f.privacy.checked;
     var emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     var telefonoOk = telefono.length >= 6;
