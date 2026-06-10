@@ -250,7 +250,7 @@
 <script>
 (function () {
   
-  var FISSO_CSV_URL   = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTdS7NgosytaYU481c9kxZwZAirxakH8o6KDOTbztwS8rzBpqCx6LTYfxk37NZQZz3v85pvUHvawF9H/pub?gid=2108781130&single=true&output=csv';
+  var FISSO_CSV_URL   = '/menu-fisso.php';   /* proxy PHP server-side: legge la scheda Menù Fisso sempre fresca, niente cache lenta/CORS */
 
   var FISSO_FALLBACK = [
     ['Fritti','Supplì alla Bolognese','Ragù misto (formato mini)'],
@@ -457,8 +457,8 @@
 
   renderFisso(FISSO_FALLBACK);
 
-  if (FISSO_CSV_URL.indexOf('http') === 0) {
-    fetch(FISSO_CSV_URL, { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (txt) {
+  if (FISSO_CSV_URL) {
+    fetch(FISSO_CSV_URL + '?_=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (txt) {
       var rows = parseCSV(txt); if (rows.length < 2) return;
       var idx = idxOf(rows[0]);
       var ci = idx['categoria'] != null ? idx['categoria'] : 0;
