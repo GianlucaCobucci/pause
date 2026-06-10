@@ -1246,11 +1246,6 @@
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email: dati.email, nome: dati.nome, telefono: normTel(dati.telefono), website: dati.website, listId: BREVO_LIST_ID })
-    }).then(function (r) {
-      return r.json().catch(function () { return {}; }).then(function (j) {
-        if (!r.ok || !j || j.ok !== true) { throw new Error('invio non riuscito'); }
-        return j;
-      });
     });
   }
 
@@ -1264,24 +1259,18 @@
     var privacyOk = f.privacy.checked;
     var emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     var telefonoOk = telefono.length >= 6;
-    var pe = document.getElementById('promoErr');
     if (!nome || !emailOk || !telefonoOk || !privacyOk) {
-      pe.textContent = 'Compila nome, telefono ed email correttamente e accetta la privacy policy.';
-      pe.style.display = 'block';
+      document.getElementById('promoErr').style.display = 'block';
       return false;
     }
-    pe.style.display = 'none';
+    document.getElementById('promoErr').style.display = 'none';
 
     function fine() {
       segnaFatto();
       f.innerHTML = '<p class="promo-text" style="text-align:center;margin:1.4rem 0 .8rem">Grazie! 🍺<br>Ora puoi sfogliare il men&ugrave; e scoprire le nostre promo.</p>';
       setTimeout(window.closePromo, 1500);
     }
-    function erroreInvio() {
-      pe.textContent = 'Invio non riuscito. Controlla la connessione e riprova tra un momento.';
-      pe.style.display = 'block';
-    }
-    inviaABrevo({ nome: nome, telefono: telefono, email: email, website: website }).then(fine).catch(erroreInvio);
+    inviaABrevo({ nome: nome, telefono: telefono, email: email, website: website }).then(fine).catch(fine);
     return false;
   };
 
