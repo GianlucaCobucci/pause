@@ -948,7 +948,7 @@
 <script>
 (function () {
   
-  var CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTdS7NgosytaYU481c9kxZwZAirxakH8o6KDOTbztwS8rzBpqCx6LTYfxk37NZQZz3v85pvUHvawF9H/pub?gid=0&single=true&output=csv';
+  var CSV_URL = '/menu.php';   /* proxy PHP server-side: legge il Foglio Google (export csv) sempre fresco, senza problemi CORS/cache */
 
   if (CSV_URL.indexOf('http') !== 0) return; 
 
@@ -1186,7 +1186,7 @@
     buildAllergenModal(bySection);
   }
 
-  fetch(CSV_URL, { cache: 'no-store' })
+  fetch(CSV_URL + '?_=' + Date.now(), { cache: 'no-store' })
     .then(function (r) { return r.text(); })
     .then(function (txt) {
       var items = rowsToItems(parseCSV(txt));
