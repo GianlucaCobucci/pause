@@ -251,7 +251,6 @@
 (function () {
   
   var FISSO_CSV_URL   = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTdS7NgosytaYU481c9kxZwZAirxakH8o6KDOTbztwS8rzBpqCx6LTYfxk37NZQZz3v85pvUHvawF9H/pub?gid=2108781130&single=true&output=csv';
-  var NORMALE_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTdS7NgosytaYU481c9kxZwZAirxakH8o6KDOTbztwS8rzBpqCx6LTYfxk37NZQZz3v85pvUHvawF9H/pub?gid=0&single=true&output=csv';
 
   var FISSO_FALLBACK = [
     ['Fritti','Supplì alla Bolognese','Ragù misto (formato mini)'],
@@ -302,10 +301,7 @@
     ['Bibite adulti','Calice di vino',''],
     ['Bibite adulti','Acqua',''],
     ['Bibite bimbi','Acqua',''],
-    ['Bibite bimbi','Lattina','']
-  ];
-  
-  var EXTRA_FALLBACK = [
+    ['Bibite bimbi','Lattina',''],
     ['Dolci','Insieme a Te No(n)ci Sto Più','Panna cotta alla nocciola con noci tritate','4'],
     ['Dolci','Super Pippo','Base biscotto, panna cotta al burro d’arachidi, sfoglie di cioccolato bianco','4'],
     ['Dolci','Il Riflesso di Pavlova','Meringa alle arachidi e noci, panna montata e coulis di frutti di bosco','4'],
@@ -321,13 +317,10 @@
     'pizze':     { panel:'p-pizze',     title:'Le Pizze',                   note:'Scegli 1 pizza — Menù Pizza' },
     'hamburger': { panel:'p-hamburger', title:'Hamburger',                  note:'Scegli 1 burger — Menù Burger' },
     'cucina':    { panel:'p-cucina',    title:'Dalla Cucina',               note:'Scegli 1 piatto — Menù Cucina' },
-    'bimbi':     { panel:'p-bimbi',     title:'Per i Bimbi',                note:'Scegli 1 piatto — Menù Bimbi' }
-  };
-  
-  var EXTRA = {
-    'dolci':         { panel:'p-dolci', title:'Dolci',                       note:'Extra — a parte dal menù fisso' },
-    'caffè e amari': { panel:'p-caffe', title:'Caffè, Amari & Digestivi',    note:'Extra — a parte dal menù fisso' },
-    'caffe e amari': { panel:'p-caffe', title:'Caffè, Amari & Digestivi',    note:'Extra — a parte dal menù fisso' }
+    'bimbi':     { panel:'p-bimbi',     title:'Per i Bimbi',                note:'Scegli 1 piatto — Menù Bimbi' },
+    'dolci':         { panel:'p-dolci', title:'Dolci',                       note:'Extra — a parte dal menù fisso', withPrice:true },
+    'caffè e amari': { panel:'p-caffe', title:'Caffè, Amari & Digestivi',    note:'Extra — a parte dal menù fisso', withPrice:true },
+    'caffe e amari': { panel:'p-caffe', title:'Caffè, Amari & Digestivi',    note:'Extra — a parte dal menù fisso', withPrice:true }
   };
 
   var AL = {
@@ -441,49 +434,28 @@
   }
 
   function renderFisso(rows) {
-    
     var byCat = {};
     rows.forEach(function (r) {
       var cat = (r.categoria != null ? r.categoria : r[0] || '').toString().trim().toLowerCase();
       var nome = (r.nome != null ? r.nome : r[1] || '').toString().trim();
       var desc = (r.descrizione != null ? r.descrizione : r[2] || '').toString().trim();
+      var prezzo = (r.prezzo != null ? r.prezzo : (r[3] || '')).toString().trim();
       var allg = (r.allergeni != null ? r.allergeni : '').toString().trim();
       var mostra = (r.mostra != null ? r.mostra : '').toString().trim();
       if (!nome) return;
       if (/^(no|n|nascondi)$/i.test(mostra)) return;
-      (byCat[cat] = byCat[cat] || []).push({ nome: nome, descrizione: desc, allergeni: allg });
+      (byCat[cat] = byCat[cat] || []).push({ nome: nome, descrizione: desc, prezzo: prezzo, allergeni: allg });
     });
     Object.keys(CAT).forEach(function (cat) {
       var c = CAT[cat];
-      renderPanel(c.panel, c.title, c.note, byCat[cat] || [], false);
+      renderPanel(c.panel, c.title, c.note, byCat[cat] || [], !!c.withPrice);
     });
     BIBITE.adulti = byCat['bibite adulti'] || BIBITE.adulti;
     BIBITE.bimbi = byCat['bibite bimbi'] || BIBITE.bimbi;
     renderBibite();
   }
-  
-  function renderExtra(rows) {
-    var bySez = {};
-    rows.forEach(function (r) {
-      var sez = (r.sezione != null ? r.sezione : r[0] || '').toString().trim().toLowerCase();
-      var nome = (r.nome != null ? r.nome : r[1] || '').toString().trim();
-      var desc = (r.descrizione != null ? r.descrizione : r[2] || '').toString().trim();
-      var prezzo = (r.prezzo != null ? r.prezzo : r[3] || '').toString().trim();
-      var allg = (r.allergeni != null ? r.allergeni : '').toString().trim();
-      var mostra = (r.mostra != null ? r.mostra : '').toString().trim();
-      if (!nome || !EXTRA[sez]) return;
-      if (/^(no|n|nascondi)$/i.test(mostra)) return;
-      (bySez[sez] = bySez[sez] || []).push({ nome: nome, descrizione: desc, prezzo: prezzo, allergeni: allg });
-    });
-    Object.keys(EXTRA).forEach(function (sez) {
-      if (!bySez[sez]) return;
-      var e = EXTRA[sez];
-      renderPanel(e.panel, e.title, e.note, bySez[sez], true);
-    });
-  }
 
   renderFisso(FISSO_FALLBACK);
-  renderExtra(EXTRA_FALLBACK);
 
   if (FISSO_CSV_URL.indexOf('http') === 0) {
     fetch(FISSO_CSV_URL, { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (txt) {
@@ -492,33 +464,17 @@
       var ci = idx['categoria'] != null ? idx['categoria'] : 0;
       var ni = idx['nome'] != null ? idx['nome'] : 1;
       var di = idx['descrizione'] != null ? idx['descrizione'] : 2;
+      var pi = idx['prezzo'] != null ? idx['prezzo'] : -1;
       var ai = idx['allergeni'] != null ? idx['allergeni'] : -1;
-      var mi = idx['mostra'] != null ? idx['mostra'] : 3;
+      var mi = idx['mostra'] != null ? idx['mostra'] : 4;
       var out = [];
       for (var k = 1; k < rows.length; k++) {
         var c = rows[k];
-        out.push({ categoria: c[ci] || '', nome: c[ni] || '', descrizione: c[di] || '', allergeni: ai >= 0 ? (c[ai] || '') : '', mostra: c[mi] || '' });
+        out.push({ categoria: c[ci] || '', nome: c[ni] || '', descrizione: c[di] || '', prezzo: pi >= 0 ? (c[pi] || '') : '', allergeni: ai >= 0 ? (c[ai] || '') : '', mostra: c[mi] || '' });
       }
       if (out.length) renderFisso(out);
     }).catch(function () {});
   }
-
-  fetch(NORMALE_CSV_URL, { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (txt) {
-    var rows = parseCSV(txt); if (rows.length < 2) return;
-    var idx = idxOf(rows[0]);
-    var si = idx['sezione'] != null ? idx['sezione'] : 0;
-    var ni = idx['nome'] != null ? idx['nome'] : 1;
-    var di = idx['descrizione'] != null ? idx['descrizione'] : 2;
-    var pi = idx['prezzo'] != null ? idx['prezzo'] : 3;
-    var ai = idx['allergeni'] != null ? idx['allergeni'] : -1;
-    var mi = idx['mostra'] != null ? idx['mostra'] : 7;
-    var out = [];
-    for (var k = 1; k < rows.length; k++) {
-      var c = rows[k];
-      out.push({ sezione: c[si] || '', nome: c[ni] || '', descrizione: c[di] || '', prezzo: c[pi] || '', allergeni: ai >= 0 ? (c[ai] || '') : '', mostra: c[mi] || '' });
-    }
-    renderExtra(out);
-  }).catch(function () {});
 
   function goTo(id) {
     var el = document.getElementById(id); if (!el) return;
