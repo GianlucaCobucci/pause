@@ -950,7 +950,7 @@
   
   var CSV_URL = '/menu.php';   /* proxy PHP server-side: legge il Foglio Google (export csv) sempre fresco, senza problemi CORS/cache */
 
-  if (CSV_URL.indexOf('http') !== 0) return; 
+  if (!CSV_URL) return;
 
   var SECTIONS = {
     fritti:     [ { key: '',  title: 'Gli Antipasti', note: 'Anche in versione senza glutine', cols: 1 } ],
